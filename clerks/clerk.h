@@ -16,12 +16,12 @@ namespace clerks
 		clerk* find_best_path() const;
 		clerk* chief() const;
 
-		clerks::vector subordinates() const;
+		vector<clerk*> subordinates() const;
 
 	private:
 		int number_ = 0;
 		int bribe_money_ = 0;
 		clerk* chief_ = nullptr;
-		clerks::vector subordinates_;
+		vector<clerk*> subordinates_;
 	};
 }

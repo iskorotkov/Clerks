@@ -2,10 +2,11 @@
 
 namespace clerks
 {
+	template <typename T>
 	class vector
 	{
 	public:
-		using type = clerk *;
+		using type = T *;
 		using iterator = type *;
 		using const_iterator = const type*;
 
@@ -13,7 +14,9 @@ namespace clerks
 		~vector();
 
 		void push_back(type value);
-		void resize(int size);
+		void resize(size_t size);
+		void remove(size_t n);
+		void remove(const_iterator i);
 
 		iterator begin() const;
 		iterator end() const;
