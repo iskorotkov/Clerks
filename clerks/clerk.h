@@ -14,6 +14,7 @@ namespace clerks
 		int number() const;
 
 		clerk* find_best_path() const;
+		clerk* chief() const;
 
 		clerks::vector subordinates() const;
 

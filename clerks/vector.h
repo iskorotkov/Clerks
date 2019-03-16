@@ -24,6 +24,8 @@ namespace clerks
 
 		bool empty() const;
 
+		type& operator[](size_t n);
+
 	private:
 		iterator storage_ = nullptr;
 		size_t size_ = 0;
