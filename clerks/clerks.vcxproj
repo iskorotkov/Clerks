@@ -151,7 +151,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="clerks.cpp" />
+    <ClCompile Include="clerk.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="search_tree.cpp" />
+    <ClCompile Include="tree.cpp" />
+    <ClCompile Include="vector.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="clerk.h" />
+    <ClInclude Include="search_tree.h" />
+    <ClInclude Include="tree.h" />
+    <ClInclude Include="vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
