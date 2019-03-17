@@ -5,17 +5,20 @@ namespace clerks
 {
 	class tree
 	{
+		friend class forest;
 	public:
-		using type = clerk *;
-		using iterator = type *;
+		using iterator = clerk *;
 
-		tree(bool manages_memory);
+		tree();
+		tree(clerk* c);
 		virtual ~tree();
 
-		virtual void emplace(type value);
+		virtual void emplace(clerk* value);
 
 	private:
 		iterator root_ = nullptr;
 		bool manages_memory_ = false;
+
+		iterator find_by_number(int n);
 	};
 }
