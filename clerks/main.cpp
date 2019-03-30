@@ -1,9 +1,6 @@
-#include <iostream>
 #include <vector>
-#include <algorithm>
-#include <functional>
 #include <fstream>
-#include <stack>
+#include <algorithm>
 
 struct clerk;
 using clerk_ptr = std::vector<clerk>::iterator;
@@ -11,14 +8,14 @@ using clerk_ptr = std::vector<clerk>::iterator;
 struct clerk
 {
 	int bribe = 0;
-	int number;
+	int number = 1;
 	std::vector<clerk_ptr> subordinates;
 };
 
 struct path
 {
-	std::vector<clerk_ptr> clerks;
 	int spent = 0;
+	std::vector<clerk_ptr> clerks;
 };
 
 path best_path(clerk_ptr chief)
@@ -52,23 +49,18 @@ int main()
 	{
 		int number, chief, bribe;
 		input >> number >> chief >> bribe;
-		--number;
-		--chief;
-		clerks.at(number).number = number + 1;
-		clerks.at(number).bribe = bribe;
-		if (chief >= 0)
+		clerks.at(number - 1).number = number;
+		clerks.at(number - 1).bribe = bribe;
+		if (chief > 0)
 		{
-			clerks.at(chief).subordinates.push_back(clerks.begin() + number);
+			clerks.at(chief - 1).subordinates.push_back(clerks.begin() + number - 1);
 		}
 		else
 		{
-			clerks_chief = clerks.begin() + number;
+			clerks_chief = clerks.begin() + number - 1;
 		}
 	}
 	auto p = best_path(clerks_chief);
 	output << p.spent << '\n';
-	for (auto c : p.clerks)
-	{
-		output << c->number << ' ';
-	}
+	std::for_each(p.clerks.cbegin(), p.clerks.cend(), [&output](const auto& c) { output << c->number << ' '; });
 }
