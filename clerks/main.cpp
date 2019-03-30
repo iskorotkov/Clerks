@@ -2,8 +2,7 @@
 #include <fstream>
 #include <algorithm>
 
-struct clerk;
-using clerk_ptr = std::vector<clerk>::iterator;
+using clerk_ptr = std::vector<struct clerk>::iterator;
 
 struct clerk
 {
@@ -26,7 +25,7 @@ path best_path(clerk_ptr chief)
 		for (const auto& c : chief->subordinates)
 		{
 			const auto p = best_path(c);
-			if (p.spent < result.spent || result.spent == 0)
+			if (result.spent == 0 || p.spent < result.spent)
 			{
 				result = p;
 			}
