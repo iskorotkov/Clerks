@@ -1,6 +1,5 @@
 #include <vector>
 #include <fstream>
-#include <algorithm>
 #include <iostream>
 #include <string>
 #include <stdexcept>
@@ -8,7 +7,6 @@
 class clerk
 {
 public:
-	clerk() = default;
 	clerk(const int number, const int bribe) : bribe_(bribe), number_(number)
 	{
 	}
@@ -22,7 +20,7 @@ public:
 	auto number() const { return number_; }
 
 private:
-	int bribe_ = 0;
+	int bribe_ = 1;
 	int number_ = 1;
 	std::vector<const clerk*> subordinates_;
 };
@@ -30,6 +28,12 @@ private:
 class path
 {
 public:
+	auto add(const clerk* c)
+	{
+		spent_ += c->bribe();
+		clerks_.emplace_back(c);
+	}
+
 	auto& clerks() { return clerks_; }
 	auto spent(const int value) { return spent_ = value; }
 
@@ -62,10 +66,16 @@ private:
 class parse_data
 {
 public:
+	parse_data(const int amount) : clerks_(amount)
+	{
+	}
+
 	auto& clerks() { return clerks_; }
+	auto& chief() { return clerks_.at(chief_index_); }
 	auto chief_index(const int value) { chief_index_ = value; }
 
 	auto& clerks() const { return clerks_; }
+	auto& chief() const { return clerks_.at(chief_index_); }
 	auto chief_index() const { return chief_index_; }
 	auto has_chief() const { return chief_index_ >= 0; }
 
@@ -88,8 +98,7 @@ path best_path(const clerk* chief)
 			}
 		}
 	}
-	result.spent(result.spent() + chief->bribe());
-	result.clerks().emplace_back(chief);
+	result.add(chief);
 	return result;
 }
 
@@ -97,7 +106,10 @@ void print_result(const path& p, const std::string& output_file)
 {
 	std::ofstream output(output_file);
 	output << p.spent() << '\n';
-	std::for_each(p.clerks().cbegin(), p.clerks().cend(), [&output](const auto& c) { output << c->number() << ' '; });
+	for (const auto& c : p.clerks())
+	{
+		output << c->number() << ' ';
+	}
 }
 
 parse_data parse_input(const std::string& input_file)
@@ -106,8 +118,7 @@ parse_data parse_input(const std::string& input_file)
 	std::ifstream input(input_file);
 	int n;
 	input >> n;
-	parse_data data;
-	data.clerks().resize(n);
+	parse_data data(n);
 	for (auto i = 0; i < n; ++i)
 	{
 		int number, chief, bribe;
@@ -124,11 +135,12 @@ parse_data parse_input(const std::string& input_file)
 		{
 			throw std::out_of_range("Некорректная сумма взятки: " + std::to_string(bribe));
 		}
-		data.clerks().at(number - 1).number(number);
-		data.clerks().at(number - 1).bribe(bribe);
+		auto& current_clerk = data.clerks().at(number - 1);
+		current_clerk.number(number);
+		current_clerk.bribe(bribe);
 		if (chief > 0)
 		{
-			data.clerks().at(chief - 1).subordinates().emplace_back(number - 1);
+			current_clerk.subordinates().emplace_back(number - 1);
 		}
 		else
 		{
@@ -146,25 +158,14 @@ parse_data parse_input(const std::string& input_file)
 	return data;
 }
 
-clerk* create_clerk(const clerk_data& data)
+clerk* create_tree(const std::vector<clerk_data>& data, const clerk_data& chief_data)
 {
-	return new clerk(data.number(), data.bribe());
-}
-
-clerk* create_subtree(const std::vector<clerk_data>& data, const int index)
-{
-	const auto& chief_data = data.at(index);
-	const auto chief = create_clerk(chief_data);
+	const auto chief = new clerk(chief_data.number(), chief_data.bribe());
 	for (const auto subordinate : chief_data.subordinates())
 	{
-		chief->subordinates().emplace_back(create_subtree(data, subordinate));
+		chief->subordinates().emplace_back(create_tree(data, data.at(subordinate)));
 	}
 	return chief;
-}
-
-clerk* create_tree(const parse_data& data)
-{
-	return create_subtree(data.clerks(), data.chief_index());
 }
 
 void clear_tree(const clerk* chief)
@@ -186,7 +187,7 @@ int main()
 	try
 	{
 		const auto data = parse_input(input_file);
-		const auto clerks_tree = create_tree(data);
+		const auto clerks_tree = create_tree(data.clerks(), data.chief());
 		const auto p = best_path(clerks_tree);
 		print_result(p, output_file);
 		clear_tree(clerks_tree);
