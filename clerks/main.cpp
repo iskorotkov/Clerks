@@ -120,7 +120,7 @@ parse_data parse_input(const std::string& input_file)
 	input >> n;
 	if (n < 0)
 	{
-		throw std::out_of_range("Некорректное количество чиновников: " + n);
+		throw std::out_of_range("Некорректное количество чиновников: " + std::to_string(n));
 	}
 	parse_data data(n);
 	for (auto i = 0; i < n; ++i)
