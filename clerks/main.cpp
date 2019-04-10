@@ -2,6 +2,8 @@
 #include <fstream>
 #include <algorithm>
 #include <iostream>
+#include <string>
+#include <stdexcept>
 
 class clerk
 {
@@ -86,16 +88,17 @@ path best_path(const clerk* chief)
 	return result;
 }
 
-void print_result(const path& p)
+void print_result(const path& p, const std::string& output_file)
 {
-	std::ofstream output("output.txt");
+	std::ofstream output(output_file);
 	output << p.spent() << '\n';
 	std::for_each(p.clerks().cbegin(), p.clerks().cend(), [&output](const auto& c) { output << c->number() << ' '; });
 }
 
-parse_data parse_input()
+parse_data parse_input(const std::string& input_file)
 {
-	std::ifstream input("input.txt");
+	const int max_clerks_number = 100;
+	std::ifstream input(input_file);
 	int n;
 	input >> n;
 	parse_data data;
@@ -104,6 +107,18 @@ parse_data parse_input()
 	{
 		int number, chief, bribe;
 		input >> number >> chief >> bribe;
+		if (number < 1 || number > n)
+		{
+			throw std::out_of_range("Некорректный номер чиновника: " + std::to_string(number));
+		}
+		if (chief < 0 || chief > n)
+		{
+			throw std::out_of_range("Некорректный номер начальника: " + std::to_string(chief));
+		}
+		if (bribe < 1 || bribe > max_clerks_number)
+		{
+			throw std::out_of_range("Некорректная сумма взятки: " + std::to_string(bribe));
+		}
 		data.clerks().at(number - 1).number(number);
 		data.clerks().at(number - 1).bribe(bribe);
 		if (chief > 0)
@@ -114,14 +129,14 @@ parse_data parse_input()
 		{
 			if (data.has_chief())
 			{
-				throw std::exception("Существует более одного чиновника без начальника");
+				throw std::logic_error("Существует несколько главных чиновников");
 			}
 			data.chief_index(number - 1);
 		}
 	}
 	if (!data.has_chief())
 	{
-		throw std::exception("Нет ни одного чиновника без начальника");
+		throw std::logic_error("Нет ни одного главного чиновника");
 	}
 	return data;
 }
@@ -164,17 +179,19 @@ void clear_tree(const clerk* chief)
 
 int main()
 {
+	const std::string input_file = "input.txt";
+	const std::string output_file = "output.txt";
 	try
 	{
-		const auto data = parse_input();
+		const auto data = parse_input(input_file);
 		const auto clerks_tree = create_tree(data);
 		const auto p = best_path(clerks_tree);
-		print_result(p);
+		print_result(p, output_file);
 		clear_tree(clerks_tree);
 	}
 	catch (const std::exception& e)
 	{
-		std::ofstream output("output.txt");
+		std::ofstream output(output_file);
 		output << e.what();
 	}
 }
