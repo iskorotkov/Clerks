@@ -144,7 +144,7 @@ parse_data parse_input(const std::string& input_file)
 		current_clerk.bribe(bribe);
 		if (chief > 0)
 		{
-			current_clerk.subordinates().emplace_back(number - 1);
+			data.clerks().at(chief - 1).subordinates().emplace_back(number - 1);
 		}
 		else
 		{
