@@ -25,7 +25,7 @@ struct clerk_data
 
 struct parse_data
 {
-	int chief_index = 0;
+	int chief_index = -1;
 	std::vector<clerk_data> clerks;
 };
 
@@ -74,8 +74,16 @@ parse_data parse_input()
 		}
 		else
 		{
+			if (data.chief_index >= 0)
+			{
+				throw std::exception("—уществует более одного чиновника без начальника");
+			}
 			data.chief_index = number - 1;
 		}
+	}
+	if (data.chief_index < 0)
+	{
+		throw std::exception("Ќет ни одного чиновника без начальника");
 	}
 	return data;
 }
@@ -120,7 +128,6 @@ void log_error(const std::exception& e)
 {
 	std::ofstream output("output.txt");
 	output << e.what();
-	std::cout << e.what();
 }
 
 int main()
