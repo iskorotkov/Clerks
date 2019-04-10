@@ -8,6 +8,11 @@
 class clerk
 {
 public:
+	clerk() = default;
+	clerk(const int number, const int bribe) : bribe_(bribe), number_(number)
+	{
+	}
+
 	auto& subordinates() { return subordinates_; }
 	auto bribe(const int value) { bribe_ = value; }
 	auto number(const int value) { number_ = value; }
@@ -84,7 +89,7 @@ path best_path(const clerk* chief)
 		}
 	}
 	result.spent(result.spent() + chief->bribe());
-	result.clerks().push_back(chief);
+	result.clerks().emplace_back(chief);
 	return result;
 }
 
@@ -97,7 +102,7 @@ void print_result(const path& p, const std::string& output_file)
 
 parse_data parse_input(const std::string& input_file)
 {
-	const int max_clerks_number = 100;
+	const auto max_clerks_number = 100;
 	std::ifstream input(input_file);
 	int n;
 	input >> n;
@@ -143,10 +148,7 @@ parse_data parse_input(const std::string& input_file)
 
 clerk* create_clerk(const clerk_data& data)
 {
-	const auto cl = new clerk;
-	cl->number(data.number());
-	cl->bribe(data.bribe());
-	return cl;
+	return new clerk(data.number(), data.bribe());
 }
 
 clerk* create_subtree(const std::vector<clerk_data>& data, const int index)
